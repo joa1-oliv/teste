@@ -1,0 +1,326 @@
+package br.ifpr.jogo.principal;
+
+import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+
+
+import javax.swing.ImageIcon;
+
+public class Personagem {
+    private int posicaoEmX;
+    private int posicaoEmY;
+    private int deslocamentoEmX;
+    private int deslocamentoEmY;
+    private Image imagem;
+    private int larguraImagem;
+    private int alturaImagem;
+
+    private static final int DESLOCAMENTO = 3;
+    private static final int POSICAO_INICIAL_EM_X = 700;
+    private static final int POSICAO_INICIAL_EM_Y = 690;
+
+    private ArrayList <Tiro> tiros;
+    
+
+    public Personagem() {
+        this.posicaoEmX = POSICAO_INICIAL_EM_X;
+        this.posicaoEmY = POSICAO_INICIAL_EM_Y;
+        this.tiros = new ArrayList <Tiro> ();
+    }
+
+    public Personagem(int posicaoEmX, int posicaoEmY, int deslocamentoEmX, int deslocamentoEmY, Image imagem,
+            int larguraImagem, int alturaImagem) {
+        this.posicaoEmX = posicaoEmX;
+        this.posicaoEmY = posicaoEmY;
+        this.deslocamentoEmX = deslocamentoEmX;
+        this.deslocamentoEmY = deslocamentoEmY;
+        this.imagem = imagem;
+        this.larguraImagem = larguraImagem;
+        this.alturaImagem = alturaImagem;
+    }
+
+    public void carregar() {
+        ImageIcon carregando = new ImageIcon("recursos\\naveroxa.png");
+        this.imagem = carregando.getImage();
+        this.alturaImagem = this.imagem.getWidth(null);
+        this.larguraImagem = this.imagem.getHeight(null);
+    }
+
+    public void atualizar() {
+        this.posicaoEmX = this.posicaoEmX + this.deslocamentoEmX;
+        this.posicaoEmY = this.posicaoEmY + this.deslocamentoEmY;
+    }
+
+    public void mover(KeyEvent tecla) {
+        int codigo = tecla.getKeyCode();
+        switch (codigo) {
+            case KeyEvent.VK_UP:
+                this.deslocamentoEmY = -DESLOCAMENTO;
+                break;
+            case KeyEvent.VK_DOWN:
+                this.deslocamentoEmY = DESLOCAMENTO;
+                break;
+            case KeyEvent.VK_LEFT:
+                this.deslocamentoEmX = -DESLOCAMENTO;
+                break;
+            case KeyEvent.VK_RIGHT:
+                this.deslocamentoEmX = DESLOCAMENTO;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void parar(KeyEvent tecla) {
+    int codigo = tecla.getKeyCode();
+    switch (codigo) {
+        case KeyEvent.VK_UP:
+             deslocamentoEmY = 0;
+             break;
+        case KeyEvent.VK_DOWN:
+            deslocamentoEmY = 0;
+            break;
+        case KeyEvent.VK_LEFT:
+            deslocamentoEmX = 0;
+            break;
+        case KeyEvent.VK_RIGHT:
+            deslocamentoEmX = 0;
+            break;
+        default:
+            break;
+    }
+}
+    public int getPosicaoEmX() {
+        return this.posicaoEmX;
+    }
+
+    public void setPosicaoEmX(int posicaoEmX) {
+        this.posicaoEmX = posicaoEmX;
+    }
+
+    public int getPosicaoEmY() {
+        return this.posicaoEmY;
+    }
+
+    public void setPosicaoEmY(int posicaoEmY) {
+        this.posicaoEmY = posicaoEmY;
+    }
+
+    public int getDeslocamentoEmX() {
+        return this.deslocamentoEmX;
+    }
+
+    public void setDeslocamentoEmX(int deslocamentoEmX) {
+        this.deslocamentoEmX = deslocamentoEmX;
+    }
+
+    public int getDeslocamentoEmY() {
+        return this.deslocamentoEmY;
+    }
+
+    public void setDeslocamentoEmY(int deslocamentoEmY) {
+        this.deslocamentoEmY = deslocamentoEmY;
+    }
+
+    public Image getImagem() {
+        return this.imagem;
+    }
+
+    public void setImagem(Image imagem) {
+        this.imagem = imagem;
+    }
+
+    public int getLarguraImagem() {
+        return this.larguraImagem;
+    }
+
+    public void setLarguraImagem(int larguraImagem) {
+        this.larguraImagem = larguraImagem;
+    }
+
+    public int getAlturaImagem() {
+        return this.alturaImagem;
+    }
+
+    public void setAlturaImagem(int alturaImagem) {
+        this.alturaImagem = alturaImagem;
+    }
+
+}
+
+==============================================================================personagem===========a cima========================================
+package br.ifpr.jogo.principal;
+
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+public class Fase extends JPanel implements ActionListener, KeyListener {
+    private Image fundo;
+    private Personagem personagem;
+    private Timer timer;
+    private static final int DELAY = 5;
+
+    public Fase() {
+        // Linha adicionada (+)
+        setFocusable(true); // + define o foco inicial do jogo
+        setDoubleBuffered(true); // + Otimização computacional
+        ImageIcon carregando = new ImageIcon("recursos\\FUNDO.png");
+        fundo = carregando.getImage();
+        personagem = new Personagem(); // + Criação do objeto Personagem
+        personagem.carregar(); // + Carregando as informações do nosso personagem
+        addKeyListener(this); // + Definindo que a própria classe irá controlar os eventos do teclado
+        timer = new Timer(DELAY, this); // + Criação do objeto Timer
+        timer.start(); // + Iniciando o nosso jogo
+    }
+
+    public void paint(Graphics g) {
+        Graphics2D graficos = (Graphics2D) g;
+        graficos.drawImage(fundo, 0, 0, null);
+        graficos.drawImage(personagem.getImagem(), personagem.getPosicaoEmX(), personagem.getPosicaoEmY(), this);
+        g.dispose();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        personagem.atualizar();
+        repaint();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        personagem.mover(e);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        personagem.parar(e);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'keyTyped'");
+    }
+}
+======================================================================= fase ========================================================
+package br.ifpr.jogo.principal;
+
+import javax.swing.JFrame;
+import java.util.ArrayList;
+
+public class Principal extends JFrame {
+    public Principal(){
+
+        Fase menu = new Fase();
+        super.add(menu);
+        super.setTitle("GALAXY DINASTY");    
+        super.setSize(1520, 1080);
+        super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        super.setLocationRelativeTo(null);
+        super.setResizable(false);
+        super.setVisible(true);
+
+    }
+    
+
+    
+    public static void main(String[] args){
+        new Principal();
+    }
+
+}
+
+=========================================================== principal =====================================================
+package br.ifpr.jogo.principal;
+
+import java.awt.Image;
+import javax.swing.ImageIcon;
+
+
+public class Tiro {
+    private int posicaoEmX;
+    private int posicaoEmY;
+    private Image imagem;
+    private int larguraImagem;
+    private int alturaImagem;
+    private static int VELOCIDADE = 2;
+
+    
+
+    public Tiro(int posicaoPersonagemEmX, int posicaoPersonagemEmY) {
+        this.posicaoEmX = posicaoPersonagemEmX;
+        this.posicaoEmY = posicaoPersonagemEmY;
+    }
+
+    public void carregar() {
+        ImageIcon carregando = new ImageIcon("recursos\\balas01.png");
+        this.imagem = carregando.getImage();
+        this.alturaImagem = this.imagem.getWidth(null);
+        this.larguraImagem = this.imagem.getHeight(null);
+    }
+
+    public void atirar(){
+        int frenteDaNave = this.posicaoEmX + this.larguraImagem;
+        int meioDaNave = this.posicaoEmY + (this.alturaImagem / 2);
+        Tiro tiro = new Tiro(frenteDaNave, meioDaNave);
+        this.tiros.add(tiro);
+    }
+
+    public void atualizar() {
+        this.posicaoEmX = this.posicaoEmX + VELOCIDADE;
+    }
+
+    public int getPosicaoEmX() {
+        return this.posicaoEmX;
+    }
+
+    public void setPosicaoEmX(int posicaoEmX) {
+        this.posicaoEmX = posicaoEmX;
+    }
+
+    public int getPosicaoEmY() {
+        return this.posicaoEmY;
+    }
+
+    public void setPosicaoEmY(int posicaoEmY) {
+        this.posicaoEmY = posicaoEmY;
+    }
+
+    public Image getImagem() {
+        return this.imagem;
+    }
+
+    public void setImagem(Image imagem) {
+        this.imagem = imagem;
+    }
+
+    public int getLarguraImagem() {
+        return this.larguraImagem;
+    }
+
+    public void setLarguraImagem(int larguraImagem) {
+        this.larguraImagem = larguraImagem;
+    }
+
+    public int getAlturaImagem() {
+        return this.alturaImagem;
+    }
+
+    public void setAlturaImagem(int alturaImagem) {
+        this.alturaImagem = alturaImagem;
+    }
+
+}
+=====================================tiro==============================================
+
+
